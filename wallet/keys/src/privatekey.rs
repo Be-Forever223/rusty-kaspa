@@ -91,6 +91,25 @@ impl PrivateKey {
         let address = Address::new(network.try_into()?, AddressVersion::PubKeyECDSA, &payload);
         Ok(address)
     }
+
+    #[wasm_bindgen(js_name= toMainnetAddress)]
+    pub fn to_mainnet_address(&self)->Result<Address>  {
+        let public_key = secp256k1::PublicKey::from_secret_key_global(&self.inner);
+        let (x_only_public_key, _) = public_key.x_only_public_key();
+        let payload = x_only_public_key.serialize();
+        let address = Address::new(kaspa_addresses::Prefix::Mainnet, AddressVersion::PubKey, &payload);
+        Ok(address)
+    }
+
+    #[wasm_bindgen(js_name = toMainnetAddressECDSA)]
+    pub fn to_mainnet_address_ecdsa(&self) -> Result<Address> {
+        let public_key = secp256k1::PublicKey::from_secret_key_global(&self.inner);
+        let (x_only_public_key, _) = public_key.x_only_public_key();
+        let payload = x_only_public_key.serialize();
+        let address = Address::new(kaspa_addresses::Prefix::Mainnet, AddressVersion::PubKeyECDSA, &payload);
+        Ok(address)
+    }
+
 }
 
 impl TryCastFromJs for PrivateKey {
